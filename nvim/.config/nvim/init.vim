@@ -131,6 +131,8 @@ set path+=/usr/include/x86_64-linux-gnu/
 " General: Plugin Install {{{
 
 call plug#begin('~/.vim/plugged')
+"html plugin boilerplate html
+Plug 'mattn/emmet-vim'
 
 " markdown preview
 Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install'  }
