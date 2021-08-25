@@ -362,6 +362,9 @@ set secure
 "enabled plugin from line 137 to these file extensions below
 let g:closetag_filenames = '*.html,*.xhtml,*.phtml, *jsx, *tsx'
 
+"emmet plugin config html ... redefine trigger key
+let g:user_emmet_leader_key = ','
+
 inoremap (  ()<ESC>hli
 inoremap [  []<ESC>hli
 inoremap "  ""<ESC>hli
