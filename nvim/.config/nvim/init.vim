@@ -131,6 +131,12 @@ set path+=/usr/include/x86_64-linux-gnu/
 " General: Plugin Install {{{
 
 call plug#begin('~/.vim/plugged')
+" plugin for js and jsx syntax prettifier
+Plug 'yuezk/vim-js'
+Plug 'maxmellon/vim-jsx-pretty'
+
+
+
 "html plugin boilerplate html
 Plug 'mattn/emmet-vim'
 
@@ -360,7 +366,8 @@ set secure
 " }}}
 
 "enabled plugin from line 137 to these file extensions below
-let g:closetag_filenames = '*.html,*.xhtml,*.phtml, *jsx, *tsx'
+let g:closetag_filenames = '*.html,*.xhtml,*.phtml, *tsx, *jsx'
+let g:closetag_xhtml_filesnames =  '*.jsx'
 
 "emmet plugin config html ... redefine trigger key
 let g:user_emmet_leader_key = ','
