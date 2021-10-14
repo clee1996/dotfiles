@@ -122,4 +122,4 @@ alias vim=nvim
 # alias zshconfig="mate ~/.zshrc"
 #alias ohmyzsh="mate ~/.oh-my-zsh"
 
-
+source ~/.priv

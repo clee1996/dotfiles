@@ -131,6 +131,26 @@ set path+=/usr/include/x86_64-linux-gnu/
 " General: Plugin Install {{{
 
 call plug#begin('~/.vim/plugged')
+
+"plugin for nvim to browse files
+if has('nvim')
+  Plug 'Shougo/defx.nvim', { 'do': ':UpdateRemotePlugins' }
+else
+  Plug 'Shougo/defx.nvim'
+  Plug 'roxma/nvim-yarp'
+  Plug 'roxma/vim-hug-neovim-rpc'
+endif
+
+
+
+
+"plugin for COC ide text editor features
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+
+
+
+
+
 " plugin for js and jsx syntax prettifier
 Plug 'yuezk/vim-js'
 Plug 'maxmellon/vim-jsx-pretty'
@@ -377,3 +397,16 @@ inoremap [  []<ESC>hli
 inoremap "  ""<ESC>hli
 inoremap '  ''<ESC>hli
 inoremap {  {}<ESC>hli
+
+
+
+let g:coc_global_extensions = ['coc-jedi',
+      \ 'coc-snippets']
+
+let g:coc_snippet_next = '<C-j>'
+let g:coc_snippet_prev = '<C-k>'
+
+nmap <silent> <C-]> <Plug>(coc-definition)
+
+
+
