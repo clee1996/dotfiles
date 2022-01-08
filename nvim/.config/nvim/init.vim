@@ -1,28 +1,4 @@
-" General: Notes
-"
-" Author: Samuel Roeca
-" Date: August 15, 2017
-" TLDR: vimrc minimum viable product for Python programming
-"
-" I've noticed that many vim/neovim beginners have trouble creating a useful
-" vimrc. This file is intended to get a Python programmer who is new to vim
-" set up with a vimrc that will enable the following:
-"   1. Sane editing of Python files
-"   2. Sane defaults for vim itself
-"   3. An organizational skeleton that can be easily extended
-"
-" Notes:
-"   * When in normal mode, scroll over a folded section and type 'za'
-"       this toggles the folded section
-"
-" Initialization:
-"   1. Follow instructions at https://github.com/junegunn/vim-plug to install
-"      vim-plug for either Vim or Neovim
-"   2. Open vim (hint: type vim at command line and press enter :p)
-"   3. :PlugInstall
-"   4. :PlugUpdate
-"   5. You should be ready for MVP editing
-"
+
 " Updating:
 "   If you want to upgrade your vim plugins to latest version
 "     :PlugUpdate
@@ -141,13 +117,29 @@ else
   Plug 'roxma/vim-hug-neovim-rpc'
 endif
 
+"plugin for fzf
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
 
+"plugin for git blame
+Plug 'tpope/vim-fugitive'
 
+"plugin for lint engine
+Plug 'dense-analysis/ale'
+
+"vim filetype formatter
+Plug 'pappasam/vim-filetype-formatter'
+
+"plugin for icon for defx
+Plug 'kristijanhusak/defx-icons'
+
+"vim-devicons
+Plug 'ryanoasis/vim-devicons'
 
 "plugin for COC ide text editor features
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
-
+Plug 'neoclide/coc-html'
 
 
 
@@ -384,14 +376,72 @@ call GlobalKeyMappings()
 set secure
 
 " }}}
+" General: Color Column {{{
+set colorcolumn=80
+highlight ColorColumn ctermbg=darkgrey
+" }}}
+" Package config for fzf {{{
+nnoremap <silent> <C-p><C-p> <Cmd>call <SID>fzf_avoid_defx('Files')<CR>
+let g:fzf_colors = {
+      \ 'fg': ['fg', 'Normal'],
+      \ 'bg': ['bg', 'Normal'],
+      \ 'hl': ['fg', 'Comment'],
+      \ 'fg+': ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+      \ 'bg+': ['bg', 'CursorLine', 'CursorColumn'],
+      \ 'hl+': ['fg', 'Statement'],
+      \ 'info': ['fg', 'PreProc'],
+      \ 'border': ['fg', 'Ignore'],
+      \ 'prompt': ['fg', 'Conditional'],
+      \ 'pointer': ['fg', 'Exception'],
+      \ 'marker': ['fg', 'Keyword'],
+      \ 'spinner': ['fg', 'Label'],
+      \ 'header': ['fg', 'Comment'],
+      \ }
+
+" Execute fzf command, but avoid doing so in a defx buffer
+function! s:fzf_avoid_defx(command)
+  if (expand('%') =~# 'defx' && winnr('$') > 1)
+    execute "normal! \<c-w>\<c-w>"
+  endif
+  execute a:command
+endfunction
+
+let g:fzf_preview_default_key_bindings =
+      \ 'ctrl-e:preview-page-down,ctrl-y:preview-page-up,?:toggle-preview'
+let $FZF_DEFAULT_OPTS = '-m --bind '
+      \ . g:fzf_preview_default_key_bindings . ' '
+      \ . '--reverse '
+      \ . '--prompt="> " '
+"let $FZF_DEFAULT_COMMAND = 'fd --type f --hidden --follow --exclude ".git"'
+
+" Floating window
+let g:fzf_layout = { 'window': {
+      \ 'width': 0.9,
+      \ 'height': 0.6,
+      \ 'yoffset': 0.9,
+      \ 'highlight': 'Ignore',
+      \ } }
+
+let g:fzf_action = {
+      \ 'ctrl-o': 'edit',
+      \ 'ctrl-t': 'tab split',
+      \ 'ctrl-x': 'split',
+      \ 'ctrl-v': 'vsplit',
+      \ }
+" }}}
+" Package config for vim-closetag {{{
 
 "enabled plugin from line 137 to these file extensions below
 let g:closetag_filenames = '*.html,*.xhtml,*.phtml, *tsx, *jsx'
 let g:closetag_xhtml_filesnames =  '*.jsx'
 
+
+" }}}
+" Package config for emmet {{{
 "emmet plugin config html ... redefine trigger key
 let g:user_emmet_leader_key = ','
-
+" }}}
+" General: Closing Brackets {{{
 inoremap (  ()<ESC>hli
 inoremap [  []<ESC>hli
 inoremap "  ""<ESC>hli
@@ -399,14 +449,140 @@ inoremap '  ''<ESC>hli
 inoremap {  {}<ESC>hli
 
 
-
+" }}}
+" Package config for COC {{{
 let g:coc_global_extensions = ['coc-jedi',
       \ 'coc-snippets']
 
 let g:coc_snippet_next = '<C-j>'
 let g:coc_snippet_prev = '<C-k>'
 
+nnoremap <silent> <C-k> <cmd>call CocAction('doHover')<CR>
 nmap <silent> <C-]> <Plug>(coc-definition)
+" }}}
+" Package config for defx {{{
+
+"defx configuration
+"nnoremap <C-n> :Defx
+map <C-space> :Defx<CR>
+
+autocmd FileType defx call s:defx_my_settings()
+function! s:defx_my_settings() abort
+  " Define mappings
+  nnoremap <silent><buffer><expr> <CR> defx#do_action('drop')
+  nnoremap <silent><buffer><expr> c defx#do_action('copy')
+  nnoremap <silent><buffer><expr> m defx#do_action('move')
+  nnoremap <silent><buffer><expr> p defx#do_action('paste')
+  nnoremap <silent><buffer><expr> l defx#do_action('open')
+  nnoremap <silent><buffer><expr> E defx#do_action('open', 'vsplit')
+  nnoremap <silent><buffer><expr> P defx#do_action('open', 'pedit')
+  nnoremap <silent><buffer><expr> o defx#do_action('open_or_close_tree')
+  nnoremap <silent><buffer><expr> K defx#do_action('new_directory')
+  nnoremap <silent><buffer><expr> N defx#do_action('new_file')
+  nnoremap <silent><buffer><expr> M defx#do_action('new_multiple_files')
+  nnoremap <silent><buffer><expr> C defx#do_action('toggle_columns', 'mark:indent:icon:filename:type:size:time')
+  nnoremap <silent><buffer><expr> S defx#do_action('toggle_sort', 'time')
+  nnoremap <silent><buffer><expr> d defx#do_action('remove')
+  nnoremap <silent><buffer><expr> r defx#do_action('rename')
+  nnoremap <silent><buffer><expr> ! defx#do_action('execute_command')
+  nnoremap <silent><buffer><expr> x defx#do_action('execute_system')
+  nnoremap <silent><buffer><expr> yy defx#do_action('yank_path')
+  nnoremap <silent><buffer><expr> . defx#do_action('toggle_ignored_files')
+  nnoremap <silent><buffer><expr> ; defx#do_action('repeat')
+  nnoremap <silent><buffer><expr> u defx#do_action('cd', ['..'])
+  nnoremap <silent><buffer><expr> ~ defx#do_action('cd')
+  nnoremap <silent><buffer><expr> q defx#do_action('quit')
+  nnoremap <silent><buffer><expr> <Space> defx#do_action('toggle_select') . 'j'
+  nnoremap <silent><buffer><expr> * defx#do_action('toggle_select_all')
+  nnoremap <silent><buffer><expr> j line('.') == line('$') ? 'gg' : 'j'
+  nnoremap <silent><buffer><expr> k line('.') == 1 ? 'G' : 'k'
+  nnoremap <silent><buffer><expr> <C-l> defx#do_action('redraw')
+  nnoremap <silent><buffer><expr> <C-g> defx#do_action('print')
+  nnoremap <silent><buffer><expr> cd defx#do_action('change_vim_cwd')
+endfunction
+
+" Set appearance
+call defx#custom#option('_', {
+      \'winwidth': 30,
+      \'split': 'vertical',
+      \'direction': 'topleft',
+      \'show_ignored_files': 0,
+      \'buffer_name': 'defxplorer',
+      \'toggle': 1,
+      \'columns': 'icon:indent:icons:filename',
+      \'resume': 1,
+      \ })
+
+call defx#custom#column('icon', {
+      \'directory_icon': '▸',
+      \'opened_icon': '▾',
+      \})
+
+let g:defx_icons_column_length = 2
+
+
+"DEFX STUFF
+function! s:autocmd_custom_defx()
+  if !exists('g:loaded_defx')
+    return
+  endif
+  call defx#custom#column('filename', {
+        \ 'min_width': 100,
+        \ 'max_width': 100,
+        \ })
+endfunction
+let g:defx_icons_column_length = 2
+function! s:open_defx_if_directory()
+  if !exists('g:loaded_defx')
+    echom 'Defx not installed, skipping...'
+    return
+  endif
+  if isdirectory(expand(expand('%:p')))
+    Defx `expand('%:p')`
+        \ -buffer-name=defx
+        \ -columns=mark:git:indent:icons:filename:type:size:time
+  endif
+endfunction
+function! s:defx_redraw()
+  if !exists('g:loaded_defx')
+    return
+  endif
+  call defx#redraw()
+endfunction
+function! s:defx_buffer_remappings() abort
+  " Define mappings
+  for [key, value] in g:custom_defx_mappings
+    execute 'nnoremap <silent><buffer><expr> ' . key . ' ' . value
+  endfor
+  nnoremap <silent><buffer> ?
+        \ :for [key, value] in g:custom_defx_mappings <BAR>
+        \ echo '' . key . ': ' . value <BAR>
+        \ endfor<CR>
+endfunction
+augroup custom_defx
+  autocmd!
+  autocmd VimEnter * call s:autocmd_custom_defx()
+  autocmd BufEnter * call s:open_defx_if_directory()
+  autocmd BufLeave,BufWinLeave \[defx\]* silent call defx#call_action('add_session')
+augroup end
+
+
+"}}}
+" Pacakage config for filetype formatter {{{
+
+"filetype formatter key mappings
+let g:vim_filetype_formatter_commands = {
+      \ 'python': 'black - -q --line-length 79',
+      \}
+nnoremap <leader>f :FiletypeFormat<cr>
+vnoremap <leader>f :FiletypeFormat<cr>
+
+
+" }}}
 
 
 
+
+" creating a line to show when to go to the next one at 80 characters
+set colorcolumn=80
+highlight ColorColumn ctermbg=darkgrey

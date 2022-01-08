@@ -9,3 +9,25 @@
   hist = log --pretty=format:'%h %ad | %s%d [%an]' --graph --date=short
   type = cat-file -t
   dump = cat-file -p
+[core]
+  pager = delta
+[delta]
+    features = decorations
+[delta "interactive"]
+    keep-plus-minus-markers = false
+[delta "decorations"]
+    minus-style = white bold "#921b0a"
+    plus-style = white bold "#1c530b"
+    side-by-side = true
+    line-numbers = true
+    commit-decoration-style = blue ol
+    commit-style = raw
+    file-style = omit
+    hunk-header-decoration-style = blue box
+    hunk-header-file-style = red
+    hunk-header-line-number-style = "#067a00"
+    hunk-header-style = file line-number syntax
+[merge]
+    conflictstyle = diff3
+
+

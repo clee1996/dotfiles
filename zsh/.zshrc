@@ -121,5 +121,27 @@ alias vim=nvim
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 #alias ohmyzsh="mate ~/.oh-my-zsh"
+alias kipctrl='cd $HOME/KIP-Rocket/KIP-Augmented-Insights-API'
 
 source ~/.priv
+
+# GIT: push current branch from origin to current branch
+function push() {
+  local current_branch="$(git rev-parse --abbrev-ref HEAD)"
+  git push -u origin "$current_branch"
+}
+# GIT: pull current branch from origin to current branch
+function pull() {
+  local current_branch="$(git rev-parse --abbrev-ref HEAD)"
+  git pull origin "$current_branch"
+}
+
+activate_venv() {
+  #if current directory has .venv
+  if [ -d .venv ]; then
+        source .venv/bin/activate
+  fi
+}
+
+#array of function names each of which will be called in order whenever working directory changes
+chpwd_functions+=(activate_venv)
